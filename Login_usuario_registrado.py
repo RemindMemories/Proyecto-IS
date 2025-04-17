@@ -1,6 +1,6 @@
 import flet as ft
 from flet import TextField, Checkbox, ElevatedButton, Text, Row, Column, ControlEvent
-
+from database import verificar_usuario,agregar_usuario
 
 def main(page: ft.Page):
     page.title = 'Pagina de bienvenida'
@@ -19,10 +19,13 @@ def main(page: ft.Page):
 
         def login(e: ft.ControlEvent):
             if text_username.value and text_password.value:
-                print(f"Usuario:, {text_username.value}")
-                print(f"Contraseña:, {text_password.value}")
-                page.clean()
-                page.add(ft.Text(f"Bienvenido, {text_username.value}!", size=20))
+                if verificar_usuario(text_username.value,text_password.value):
+                    print(f"Usuario:, {text_username.value}")
+                    print(f"Contraseña:, {text_password.value}")
+                    page.clean()
+                    page.add(ft.Text(f"Bienvenido, {text_username.value}!", size=20))
+                else:
+                    show_signup()                    
             else:
                 print("Por favor, ingrese su usuario y contraseña.")
                 page.snack_bar.open = True
@@ -59,9 +62,12 @@ def main(page: ft.Page):
             page.update()
 
         def submit(e: ControlEvent):
-            print("Registrado:", text_username.value)
+            if agregar_usuario(text_username.value,text_password.value):
+                print("Registrado:", text_username.value)
+            else:
+                print("Fallo al registrar el usuario")
             page.clean()
-            page.add(Text(f"Gracias por registrarte, {text_username.value}!", size=20))
+            page.add( Text(f"Gracias por registrarte, {text_username.value}!", size=20))
 
         text_username.on_change = validate
         text_password.on_change = validate
