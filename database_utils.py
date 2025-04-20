@@ -1,0 +1,61 @@
+import mysql.connector
+import bcrypt
+
+def conectar_db():
+    try:
+        conexion = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="contraseña",
+            database="usuarios",
+            port=3306
+        )
+        return conexion
+    except mysql.connector.Error as err:
+        print(f"Error al conectar a la base de datos: {err}")
+        return None
+
+def verificar_usuario(username, password):
+    conexion = conectar_db()
+    if not conexion:
+        return False, "No se pudo conectar a la base de datos"
+
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("SELECT CONTRASENA FROM usuarios WHERE USUARIO = %s", (username,))
+        resultado = cursor.fetchone()
+        cursor.close()
+        conexion.close()
+
+        if resultado and bcrypt.checkpw(password.encode('utf-8'), resultado[0].encode('utf-8')):
+            return True, "Inicio de sesión exitoso"
+        else:
+            return False, "Usuario o contraseña incorrectos"
+
+    except mysql.connector.Error as err:
+        return False, f"Error al verificar usuario: {err}"
+
+def agregar_usuario(username, password):
+    conexion = conectar_db()
+    if not conexion:
+        return False, "Error al conectar con la base de datos"
+
+    try:
+        cursor = conexion.cursor()
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        cursor.execute(
+            "INSERT INTO usuarios (USUARIO, CONTRASENA, CONTRASENA_ORIGINAL) VALUES (%s, %s, %s)",
+            (username, hashed_pw, password)
+        )
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return True, "Usuario registrado con éxito"
+
+    except mysql.connector.errors.IntegrityError as e:
+        if "1062" in str(e):
+            return False, "El nombre de usuario ya está registrado"
+        return False, "Error desconocido: " + str(e)
+
+    except mysql.connector.Error as err:
+        return False, f"Error al registrar usuario: {err}"
