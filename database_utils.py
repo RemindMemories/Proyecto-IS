@@ -1,12 +1,13 @@
 import mysql.connector
 import bcrypt
 
+
 def conectar_db():
     try:
         conexion = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="contraseña",
+            password="",
             database="usuarios",
             port=3306
         )
@@ -15,14 +16,14 @@ def conectar_db():
         print(f"Error al conectar a la base de datos: {err}")
         return None
 
-def verificar_usuario(username, password):
+def verificar_usuario(username_or_email, password):
     conexion = conectar_db()
     if not conexion:
         return False, "No se pudo conectar a la base de datos"
 
     try:
         cursor = conexion.cursor()
-        cursor.execute("SELECT CONTRASENA FROM usuarios WHERE USUARIO = %s", (username,))
+        cursor.execute("SELECT CONTRASENA FROM usuarios WHERE USUARIO = %s OR CORREO = %s", (username_or_email,username_or_email))
         resultado = cursor.fetchone()
         cursor.close()
         conexion.close()
@@ -35,7 +36,7 @@ def verificar_usuario(username, password):
     except mysql.connector.Error as err:
         return False, f"Error al verificar usuario: {err}"
 
-def agregar_usuario(username, password):
+def agregar_usuario(username, email, password):
     conexion = conectar_db()
     if not conexion:
         return False, "Error al conectar con la base de datos"
@@ -44,8 +45,8 @@ def agregar_usuario(username, password):
         cursor = conexion.cursor()
         hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         cursor.execute(
-            "INSERT INTO usuarios (USUARIO, CONTRASENA, CONTRASENA_ORIGINAL) VALUES (%s, %s, %s)",
-            (username, hashed_pw, password)
+            "INSERT INTO usuarios (USUARIO, CORREO, CONTRASENA, CONTRASENA_ORIGINAL) VALUES (%s, %s, %s,%s)",
+            (username, email, hashed_pw, password)
         )
         conexion.commit()
         cursor.close()
@@ -54,8 +55,9 @@ def agregar_usuario(username, password):
 
     except mysql.connector.errors.IntegrityError as e:
         if "1062" in str(e):
-            return False, "El nombre de usuario ya está registrado"
+            return False, "El nombre de usuario o correo ya está registrado"
         return False, "Error desconocido: " + str(e)
 
     except mysql.connector.Error as err:
         return False, f"Error al registrar usuario: {err}"
+
