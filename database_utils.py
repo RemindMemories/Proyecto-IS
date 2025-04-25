@@ -80,7 +80,7 @@ def buscar_libro(nombre):
 def buscar_autor(nombre):
     conexion = conectar_db()
     cursor = conexion.cursor()
-    cursor.execute("SELECT * FROM libros WHERE NOMBRE = %s",(nombre))
+    cursor.execute("SELECT FROM libros WHERE NOMBRE = %s",(nombre))
     resultado = cursor.fetchall()
     cursor.close()
     conexion.close()
