@@ -23,18 +23,26 @@ def verificar_usuario(username_or_email, password):
 
     try:
         cursor = conexion.cursor()
-        cursor.execute("SELECT CONTRASENA FROM usuarios WHERE USUARIO = %s OR CORREO = %s", (username_or_email,username_or_email))
+        cursor.execute("SELECT USUARIO, CONTRASENA FROM usuarios WHERE USUARIO = %s OR CORREO = %s", 
+                       (username_or_email, username_or_email))
+
         resultado = cursor.fetchone()
         cursor.close()
         conexion.close()
 
-        if resultado and bcrypt.checkpw(password.encode('utf-8'), resultado[0].encode('utf-8')):
-            return True, "Inicio de sesión exitoso"
-        else:
-            return False, "Usuario o contraseña incorrectos"
-
+        if resultado:
+            usuario_db, contrasena_db = resultado
+            if bcrypt.checkpw(password.encode('utf-8'), contrasena_db.encode('utf-8')):
+                return True, usuario_db
+            
+        return False, "Usuario o contraseña incorrecta"
     except mysql.connector.Error as err:
         return False, f"Error al verificar usuario: {err}"
+
+
+            
+
+
 
 def agregar_usuario(username, email, password):
     conexion = conectar_db()
@@ -60,4 +68,3 @@ def agregar_usuario(username, email, password):
 
     except mysql.connector.Error as err:
         return False, f"Error al registrar usuario: {err}"
-
