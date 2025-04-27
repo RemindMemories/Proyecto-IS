@@ -66,26 +66,56 @@ def agregar_usuario(username, email, password):
     except mysql.connector.Error as err:
         return False, f"Error al registrar usuario: {err}"
     
-def buscar_libro(nombre):
+def buscar_libro_autor(name, author):
     conexion = conectar_db()
-    cursor = conexion.cursor()
-    cursor.execute( "SELECT FROM libros WHERE NOMBRE = %s",(nombre))
-    resultado = cursor.fetchone()
-    cursor.close()
-    conexion.close()
-    if resultado: 
-        return True, "Se encontro el libro"
-    return False, "El libro no se encuentra"
+    if not conexion:
+        return False, "Error al conectar con la base de datos"
+    try:
+        cursor = conexion.cursor()
+        if name and author:           
+            cursor.execute("SELECT * FROM libros WHERE NOMBRE = %s AND AUTOR = %s", (name, author))
+        elif name:            
+            cursor.execute("SELECT * FROM libros WHERE NOMBRE = %s", (name,))
+        elif author:           
+            cursor.execute("SELECT * FROM libros WHERE AUTOR = %s", (author,))
+        else:
+            return False, "Debes proporcionar al menos un criterio de búsqueda"        
+        resultado = cursor.fetchall()
+        cursor.close()
+        conexion.close()        
+        return  resultado
+    except mysql.connector.Error as err:
+        return False, f"Error al buscar libro: {err}"
 
-def buscar_autor(nombre):
+
+def agregar_libro(name,author,publication,genre,synopsis):
     conexion = conectar_db()
-    cursor = conexion.cursor()
-    cursor.execute("SELECT FROM libros WHERE NOMBRE = %s",(nombre))
-    resultado = cursor.fetchall()
-    cursor.close()
-    conexion.close()
-    if resultado: 
-        return True, "Libros encontrados del autor"
-    return False, "No se encontraron libros del autor"
+    if not conexion:
+        return False, "Error al conectar con la base de datos"
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("INSERT INTO libros (NOMBRE, AUTOR, PUBLICACION, GENERO, SINOPSIS) VALUES (%s,%s,%s,%s,%s)",
+                     (name,author,publication,genre,synopsis))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return True, "Libro agregado con exito"
+    except mysql.connector.Error as err:
+        return False, f"Error al agregar libro: {err}"
+     
+
+def eliminar_libro(name):
+    conexion = conectar_db()
+    if not conexion:
+        return False, "Error al conectar con la base de datos"
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("DELETE FROM libros WHERE NAME = %s",(name))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return True, "Libro eliminado con exito"
+    except mysql.connector.Error as err:
+        return False, f"Error al eliminar libro:{err}"
 
 
