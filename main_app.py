@@ -1,7 +1,7 @@
 import flet as ft
 from flet import Page
 from flet import TextField, ElevatedButton, Text, Column, ControlEvent, Container, alignment
-
+from database_utils import buscar_libro_autor
 def show_main_app(page: Page, username: str, go_back):
         page.title = 'Aplicación Principal'
         page.clean()
@@ -35,7 +35,7 @@ def show_main_app(page: Page, username: str, go_back):
             style_button(
                 text="Buscar libros",
                 icon=ft.Icons.SEARCH, 
-                on_click=lambda e: navigate_to_section("Buscar libros 🔎​")),
+                on_click=lambda e: show_search_books("Buscar libros 🔎​")),
             style_button(text="Mis libros",
                          icon=ft.Icons.BOOK, 
                          on_click=lambda e: navigate_to_section("Mis libros 📚​")),         
@@ -76,21 +76,26 @@ def show_main_app(page: Page, username: str, go_back):
                   expand=True,
              )
         )
-
+        
         def show_search_books(e):
             page.clean()
-            search_text = TextField(label='Buscar libros', width=200)
-            search_button = ElevatedButton("Buscar", on_click=lambda e: search_books(search_text.value))
+            search_text_book = TextField(label='Buscar libro', width=200)
+            search_text_author = TextField(label='Buscar libro por autor', width=200)
+            search_button = ElevatedButton("Buscar", on_click=lambda e: search_books(search_text_book.value,search_text_author.value))
             message = Text("", color="red")
 
-            def search_books(query):
-                # Aquí iría la lógica para buscar libros
-                message.value = f"Buscando libros con '{query}'..."
-                page.update()
-
+            def search_books(name,author):               
+              libro_info = buscar_libro_autor(name,author)
+              if libro_info:
+                  message.value = f"✅{libro_info} "     
+              else:
+                  message.value = "❌Libro no encontrado "                                           
+              page.update()        
+            
             content = Column([
                 Text("Buscar libros", size=24, weight="bold"),
-                search_text,
+                search_text_book,
+                search_text_author,
                 search_button,
                 message
             ],
@@ -98,4 +103,7 @@ def show_main_app(page: Page, username: str, go_back):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
             page.add(Container(content=content, alignment=alignment.center, expand=True))
+    
+
+
 
