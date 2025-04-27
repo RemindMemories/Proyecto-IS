@@ -2,14 +2,25 @@ import flet as ft
 import re
 from flet import TextField, Checkbox, ElevatedButton, Text, Column, ControlEvent, Container, alignment
 from database_utils import verificar_usuario, agregar_usuario
+from admin_page import admin_panel
+from main_app import show_main_app
 
 def main(page: ft.Page):
     page.title = 'Librería Búho​'
     page.theme_mode = ft.ThemeMode.LIGHT
+    
+    page.theme = ft.Theme(
+        color_scheme_seed=ft.Colors.AMBER,
+        font_family="Roboto",
+        color_scheme=ft.ColorScheme(
+            primary=ft.Colors.BLUE_800,
+        )
+    )
     page.window_width = 400
     page.window_height = 400
     page.window_resizable = False
-
+   
+   
     def show_landing():
         page.clean()
 
@@ -22,7 +33,7 @@ def main(page: ft.Page):
                 success, result = verificar_usuario(text_username.value, text_password.value)
                 if success:
                     page.clean()
-                    show_main_app(result)
+                    show_main_app(page, result, go_back=lambda: show_landing())
                 else:
                     message.value = result
                     page.update()
@@ -32,12 +43,12 @@ def main(page: ft.Page):
 
         content = Column(
             [
-                Text("Librería Búho 🦉📚​​", size=30, weight="bold"),
+                Text("Librería Búho 🦉📚​​", size=30,weight="bold"),
                 Text("¡Conecta todas las bibliotecas Unison!", size=15),
                 text_username,
                 text_password,
                 ElevatedButton("Iniciar sesión", on_click=login),
-                ElevatedButton("Admin ⚙️", on_click=lambda e: show_main_app("admin")),
+                ElevatedButton("Admin ⚙️", on_click=lambda e: admin_panel(page, lambda: show_landing())),
                 ElevatedButton("¿No tienes cuenta? Regístrate", on_click=lambda e: show_signup()),
                 message
             ],
@@ -86,7 +97,7 @@ def main(page: ft.Page):
             success, msg = agregar_usuario(text_username.value,text_email.value, text_password.value)
             if success:
                 page.clean()
-                show_main_app(text_username.value)
+                show_main_app(page, text_username.value, go_back=lambda: show_landing())
             else:
                 message.value = msg
                 page.update()
@@ -121,72 +132,7 @@ def main(page: ft.Page):
 
     # Main app function
     # This function will be called after successful login
-    def show_main_app(username: str):
-        page.clean()
-
-        selected_section = Text("Seleccione una opcion ;P", size=16, weight="bold")
-        
-        def navigate_to_section(section: str):
-            selected_section.value = f"{section}"
-            page.update()
-        
-        def logout(e):
-            page.clean()
-            show_landing()
-
-        nav_buttons = Column([
-            ElevatedButton("Home", on_click=lambda e: navigate_to_section("Home")),
-            ElevatedButton("Buscar libros", on_click=lambda e: navigate_to_section("Buscar libros")),
-            ElevatedButton("Mis libros", on_click=lambda e: navigate_to_section("Mis libros")),
-            ElevatedButton("Cerrar sesión", color = "red", on_click=logout),
-        ],
-        spacing=10
-        )
-
-        content = Column([
-            Text(f"Bienvenid@, {username}! 🦉​", size=24, weight="bold"),
-            selected_section
-        ])
-
-        page.add(
-            Container(
-                content=ft.Row(
-                    controls=[
-                        Container(nav_buttons, width=150,padding=10),
-                        Container(content, expand=True, padding=10),
-                    ],
-                    expand=True,
-                ),
-                expand=True,
-            )
-        )
-
-        def show_search_books(e):
-            page.clean()
-            search_text = TextField(label='Buscar libros', width=200)
-            search_button = ElevatedButton("Buscar", on_click=lambda e: search_books(search_text.value))
-            message = Text("", color="red")
-
-            def search_books(query):
-                # Aquí iría la lógica para buscar libros
-                message.value = f"Buscando libros con '{query}'..."
-                page.update()
-
-            content = Column([
-                Text("Buscar libros", size=24, weight="bold"),
-                search_text,
-                search_button,
-                message
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER)
-
-            page.add(Container(content=content, alignment=alignment.center, expand=True))
-
-
-
-
-
+    
     show_landing()
 
 if __name__ == "__main__":
