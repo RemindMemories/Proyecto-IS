@@ -8,7 +8,7 @@ def conectar_db():
             host="localhost",
             user="root",
             password="",
-            database="libreria",
+            database="usuario",
             port=3306
         )
         return conexion
