@@ -8,7 +8,7 @@ def conectar_db():
             host="localhost",
             user="root",
             password="",
-            database="usuarios",
+            database="libreria",
             port=3306
         )
         return conexion
@@ -82,8 +82,14 @@ def buscar_libro_autor(name, author):
             return False, "Debes proporcionar al menos un criterio de búsqueda"        
         resultado = cursor.fetchall()
         cursor.close()
-        conexion.close()        
-        return  resultado
+        conexion.close()
+        if resultado:        
+            titulo = resultado[0][0]
+            autor = resultado[0][1]
+            date = resultado[0][2]
+            genero = resultado[0][3]
+            sinopsis = resultado[0][4]
+            return f"Titulo:{titulo}\nAutor:{autor}\nFecha de publicacion:{date}\nGenero:{genero}\nSinopsis:{sinopsis}"        
     except mysql.connector.Error as err:
         return False, f"Error al buscar libro: {err}"
 
