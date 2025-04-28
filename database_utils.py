@@ -7,7 +7,7 @@ def conectar_db():
         conexion = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="olakase1",
+            password="",
             database="libreria",
             port=3306
         )
