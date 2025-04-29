@@ -30,10 +30,13 @@ def main(page: ft.Page):
 
         def login(e: ControlEvent):
             if text_username.value and text_password.value:
-                success, result = verificar_usuario(text_username.value, text_password.value)
+                success, result, next_panel = verificar_usuario(text_username.value, text_password.value)
                 if success:
                     page.clean()
-                    show_main_app(page, result, go_back=lambda: show_landing())
+                    if next_panel == "admin":
+                        admin_panel(page, lambda: show_landing())
+                    else:
+                        show_main_app(page, result, go_back=lambda: show_landing())
                 else:
                     message.value = result
                     page.update()
@@ -48,7 +51,7 @@ def main(page: ft.Page):
                 text_username,
                 text_password,
                 ElevatedButton("Iniciar sesión", on_click=login),
-                ElevatedButton("Admin ⚙️", on_click=lambda e: admin_panel(page, lambda: show_landing())),
+                # ElevatedButton("Admin ⚙️", on_click=lambda e: admin_panel(page, lambda: show_landing())),
                 ElevatedButton("¿No tienes cuenta? Regístrate", on_click=lambda e: show_signup()),
                 message
             ],
