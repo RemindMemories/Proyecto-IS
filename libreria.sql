@@ -8,7 +8,8 @@ CREATE TABLE usuarios (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     USUARIO VARCHAR(50) NOT NULL UNIQUE,
     CORREO VARCHAR(255) NOT NULL UNIQUE,
-    CONTRASENA VARCHAR(255) NOT NULL
+    CONTRASENA VARCHAR(255) NOT NULL,
+    ROL ENUM('admin', 'usuario') NOT NULL DEFAULT 'usuario'
 );
 
 CREATE TABLE libros (
@@ -29,10 +30,11 @@ GRANT ALL PRIVILEGES ON libreria.* TO 'admin'@'localhost';
 
 CREATE USER IF NOT EXISTS 'lector'@'localhost' IDENTIFIED BY 'Lector1234!';
 GRANT SELECT ON libreria.libros TO 'lector'@'localhost';
+GRANT SELECT ON libreria.usuarios TO 'lector'@'localhost';
 
 FLUSH PRIVILEGES;
 
-INSERT INTO usuarios (USUARIO, CORREO, CONTRASENA) 
-VALUES ('admin', 'admin@gmail.com', '$2b$12$MTIzNDU2Nzg5MDEyMzQ1OuGd/vcRz3O/mFBVpHpkR2xMnduCeFuyW')
+INSERT INTO usuarios (USUARIO, CORREO, CONTRASENA, ROL) 
+VALUES ('admin', 'admin@gmail.com', '$2b$12$YcCpCQyLVhHxsugvToppjuPApAqkrIXcIQb.pQAvW36sArfd2YyRy', 'admin')
 ON DUPLICATE KEY UPDATE USUARIO=USUARIO;
 
