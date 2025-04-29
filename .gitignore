@@ -10,7 +10,7 @@ env/
 ENV/
 
 # Archivos de UV & Conda
-.uv.lock
+uv.lock
 *.conda
 .python-version
 *.toml
