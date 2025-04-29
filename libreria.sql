@@ -20,11 +20,14 @@ CREATE TABLE libros (
     PORTADA VARCHAR(255)  -- Guardar nombre de imagen en la portada "HarryPotter.jpg"
 );
 
+DROP USER IF EXISTS 'admin'@'localhost';
+DROP USER IF EXISTS 'lector'@'localhost';
+
 CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'Admin1234!';
 GRANT ALL PRIVILEGES ON libreria.* TO 'admin'@'localhost';
 
 
-CREATE USER IF NOT EXISTS 'lector'@'localhost' IDENTIFIED BY 'Lector123!';
+CREATE USER IF NOT EXISTS 'lector'@'localhost' IDENTIFIED BY 'Lector1234!';
 GRANT SELECT ON libreria.libros TO 'lector'@'localhost';
 
 FLUSH PRIVILEGES;

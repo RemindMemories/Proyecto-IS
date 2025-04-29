@@ -2,12 +2,14 @@ import mysql.connector
 import bcrypt
 
 
-def conectar_db():
+def conectar_db(modo='lectura'):
+    usuario = 'lector' if modo == 'lectura' else 'admin'
+    password = 'Lector1234!' if modo == 'lectura' else 'Admin1234!'
     try:
         conexion = mysql.connector.connect(
             host="localhost",
-            user="root",
-            password="",
+            user=usuario,
+            password=password,
             database="libreria",
             port=3306
         )
@@ -42,7 +44,7 @@ def verificar_usuario(username_or_email, password):
 
 
 def agregar_usuario(username, email, password):
-    conexion = conectar_db()
+    conexion = conectar_db(modo='admin')
     if not conexion:
         return False, "Error al conectar con la base de datos"
 
@@ -50,8 +52,8 @@ def agregar_usuario(username, email, password):
         cursor = conexion.cursor()
         hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         cursor.execute(
-            "INSERT INTO usuarios (USUARIO, CORREO, CONTRASENA, CONTRASENA_ORIGINAL) VALUES (%s, %s, %s,%s)",
-            (username, email, hashed_pw, password)
+            "INSERT INTO usuarios (USUARIO, CORREO, CONTRASENA) VALUES (%s, %s, %s)",
+            (username, email, hashed_pw)
         )
         conexion.commit()
         cursor.close()
@@ -89,7 +91,7 @@ def buscar_libro_autor(name, author):
 
 
 def agregar_libro(name, author, publication, genre, synopsis, portada):
-    conexion = conectar_db()
+    conexion = conectar_db(modo='admin')
     if not conexion:
         return False, "Error al conectar con la base de datos"
     try:
@@ -108,7 +110,7 @@ def agregar_libro(name, author, publication, genre, synopsis, portada):
      
 
 def eliminar_libro(name):
-    conexion = conectar_db()
+    conexion = conectar_db(modo='admin')
     if not conexion:
         return False, "Error al conectar con la base de datos"
     try:
