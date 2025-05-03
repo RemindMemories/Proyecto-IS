@@ -155,6 +155,18 @@ def consultar_info_libro(nombre):
         return resultado
     except mysql.connector.Error as err:
         return False, f"Error al consultar información del libro: {err}"
-
-
+    
+def mostrar_usuarios():
+    conexion = conectar_db(modo='admin')
+    if not conexion:
+        return False, "Error al conectar con la base de datos"
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("SELECT USUARIO, CORREO FROM usuarios ORDER BY USUARIO ASC")
+        resultado = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return resultado
+    except mysql.connector.Error as err:
+        return False, f"Error al consultar la infromacion: {err}"
 
