@@ -100,9 +100,7 @@ def admin_panel(page: ft.Page, go_back):
             mensaje
         ], spacing=10))
 
-    def eliminar_usuarios():
-        usuario = mostrar_usuarios()
-        eliminar_usuario(usuario[0])
+    
 
     def mostrar_usuarios_admin():
        usuarios = mostrar_usuarios()
@@ -113,7 +111,7 @@ def admin_panel(page: ft.Page, go_back):
                columns=[
                 ft.DataColumn(Text("NOMBRE")),
                 ft.DataColumn(Text("Correo")),
-                ft.DataColumn((Text("")))
+                
             ],
             rows=[
                 ft.DataRow(
@@ -121,8 +119,7 @@ def admin_panel(page: ft.Page, go_back):
                         ft.DataCell(Text(usuario[0])),
 
                         ft.DataCell(Text(usuario[1])),
-
-                        ft.DataCell(ElevatedButton("Eliminar usuario",on_click=eliminar_usuarios()))
+                        
                     ],
                 ) for usuario in usuarios
             ],
