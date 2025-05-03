@@ -1,6 +1,7 @@
 import flet as ft
 from flet import ElevatedButton, Text, Column, Container, TextField, Row, alignment, Image
-import database_utils
+import database_utils 
+from database_utils import mostrar_usuarios, eliminar_usuario
 from libros_ui import mostrar_inventario_ui, mostrar_info_libro_ui
 
 def admin_panel(page: ft.Page, go_back):
@@ -25,8 +26,7 @@ def admin_panel(page: ft.Page, go_back):
         elif section == "Ver inventario 📦​":
             mostrar_inventario()
         elif section == "Ver usuarios 👤​":
-            content.controls.append(Text("Funcionalidad de ver usuarios aún no implementada.", color="blue"))
-
+            mostrar_usuarios_admin()
         page.update()
 
     def style_button(text, icon, on_click, color=None):
@@ -99,6 +99,39 @@ def admin_panel(page: ft.Page, go_back):
             ElevatedButton("Eliminar libro", on_click=eliminar_libro),
             mensaje
         ], spacing=10))
+
+    def eliminar_usuarios():
+        usuario = mostrar_usuarios()
+        eliminar_usuario(usuario[0])
+
+    def mostrar_usuarios_admin():
+       usuarios = mostrar_usuarios()
+       if not usuarios:
+           content.controls.append(Text("❗ Error no se encontraron usuarios"))
+       else:
+           tabla = ft.DataTable(
+               columns=[
+                ft.DataColumn(Text("NOMBRE")),
+                ft.DataColumn(Text("Correo")),
+                ft.DataColumn((Text("")))
+            ],
+            rows=[
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(Text(usuario[0])),
+
+                        ft.DataCell(Text(usuario[1])),
+
+                        ft.DataCell(ElevatedButton("Eliminar usuario",on_click=eliminar_usuarios()))
+                    ],
+                ) for usuario in usuarios
+            ],
+
+           )
+           content.controls.append(tabla)
+        
+   
+
 
     nav_buttons = Column([
         ft.Divider(height=60, color="transparent"),
