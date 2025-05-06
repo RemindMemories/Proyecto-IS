@@ -1,8 +1,8 @@
 import flet as ft
 from flet import ElevatedButton, Text, Column, Container, TextField, Row, alignment, Image
 import database_utils 
-from database_utils import mostrar_usuarios, eliminar_usuario
-from libros_ui import mostrar_inventario_ui, mostrar_info_libro_ui
+from database_utils import mostrar_usuarios,eliminar_libro
+from libros_ui import mostrar_inventario_ui, mostrar_info_libro_ui,formulario_eliminar_ui
 
 def admin_panel(page: ft.Page, go_back):
     page.title = 'Panel de administración'
@@ -22,7 +22,7 @@ def admin_panel(page: ft.Page, go_back):
         if section == "Agregar libro 📚​":
             mostrar_formulario_agregar_libro()
         elif section == "Eliminar libro ❌​":
-            mostrar_formulario_eliminar_libro()
+            eliminar()
         elif section == "Ver inventario 📦​":
             mostrar_inventario()
         elif section == "Ver usuarios 👤​":
@@ -42,6 +42,14 @@ def admin_panel(page: ft.Page, go_back):
             mostrar_info_libro_ui(page, content, nombre_libro, mostrar_inventario)
         mostrar_inventario_ui(page, content, ver_info_libro)
 
+    def eliminar():
+        def eliminar_libro_ad(nombre_libro):
+            formulario_eliminar_ui(page,content,nombre_libro,eliminar_libro)            
+        mostrar_inventario_ui(page,content,eliminar_libro_ad)
+        page.dialog = False
+        page.update()
+
+    
 
     def mostrar_formulario_agregar_libro():
         titulo_field = TextField(label="Título")
@@ -79,8 +87,7 @@ def admin_panel(page: ft.Page, go_back):
 
     def mostrar_formulario_eliminar_libro():
         nombre_field = TextField(label="Nombre del libro a eliminar")
-        mensaje = Text("")
-
+        mensaje = Text("")        
         def eliminar_libro(e):
             if not nombre_field.value:
                 mensaje.value = "❗ El nombre del libro es obligatorio."
@@ -103,7 +110,7 @@ def admin_panel(page: ft.Page, go_back):
     
 
     def mostrar_usuarios_admin():
-       usuarios = mostrar_usuarios()
+       usuarios = mostrar_usuarios()                
        if not usuarios:
            content.controls.append(Text("❗ Error no se encontraron usuarios"))
        else:
@@ -112,13 +119,14 @@ def admin_panel(page: ft.Page, go_back):
                 ft.DataColumn(Text("NOMBRE")),
                 ft.DataColumn(Text("Correo")),
                 
+                
             ],
             rows=[
                 ft.DataRow(
                     cells=[
                         ft.DataCell(Text(usuario[0])),
 
-                        ft.DataCell(Text(usuario[1])),
+                        ft.DataCell(Text(usuario[1])),                        
                         
                     ],
                 ) for usuario in usuarios
