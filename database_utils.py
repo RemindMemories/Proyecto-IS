@@ -115,8 +115,7 @@ def eliminar_libro(name):
         return False, "Error al conectar con la base de datos"
     try:
         cursor = conexion.cursor()
-        cursor.execute("DELETE FROM libros WHERE NOMBRE = %s", (name,))
-        
+        cursor.execute("DELETE FROM libros WHERE NOMBRE = %s", (name,))        
         # Verifica si se ha eliminado al menos un registro
         if cursor.rowcount == 0:
             return False, f"No se encontró un libro con el nombre '{name}'"
@@ -170,3 +169,15 @@ def mostrar_usuarios():
     except mysql.connector.Error as err:
         return False, f"Error al consultar la infromacion: {err}"
 
+def eliminar_usuario(nombre):
+    conexion = conectar_db()
+    if not conexion: 
+        return False, "Error al conectar con la base de datos"
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("DELETE FROM usuarios WHERE USUARIO = %s",(nombre,))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+    except mysql.connector.Error as err:
+        return False, f"Error al eliminar el usuario"
